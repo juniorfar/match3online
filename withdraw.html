@@ -1,0 +1,56 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Withdraw to PayPal</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; }
+  label { display:block; margin-top: 10px; }
+</style>
+<h1>Request Withdrawal</h1>
+<p>Enter your PayPal email and amount (USD).</p>
+<form id="withdrawForm">
+  <label>PayPal Email
+    <input type="email" id="paypal_email" required />
+  </label>
+  <label>Amount (USD)
+    <input type="number" id="amount" step="0.01" min="1.00" required />
+  </label>
+  <button type="submit">Request Withdrawal</button>
+</form>
+<div id="msg"></div>
+
+<script>
+  // NOTE: This demo assumes you have a valid JWT for the user.
+  // Replace getJwt() implementation to return a real token from your auth flow.
+  function getJwt() {
+    // Example: fetch('/auth/token') or get from localStorage
+    return localStorage.getItem('jwt') || '';
+  }
+
+  document.getElementById('withdrawForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('paypal_email').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+    const token = getJwt();
+    if (!token) {
+      document.getElementById('msg').innerText = 'You must be logged in (JWT missing).';
+      return;
+    }
+    try {
+      const res = await fetch('https://api.match3onlinerewareds.gamer.gd/api/withdraw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ paypal_email: email, amount: amount, currency: 'USD' })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || JSON.stringify(data));
+      document.getElementById('msg').innerText = 'Request submitted: ' + data.id;
+    } catch (err) {
+      document.getElementById('msg').innerText = 'Error: ' + err.message;
+    }
+  });
+</script>
+
+<!-- CORS note: Ensure the backend at https://api.match3onlinerewareds.gamer.gd allows CORS from your site origin -->
