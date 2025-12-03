@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match3 Rewards Game - Earn PayPal Payouts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            color: #ffcc00;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 15px rgba(255, 204, 0, 0.7);
+        }
+        
+        .subtitle {
+            color: #a0e7ff;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 10px;
+        }
+        
+        .paypal-note {
+            background: rgba(0, 81, 162, 0.2);
+            border-left: 4px solid #003087;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .game-board-container {
+            flex: 3;
+            min-width: 350px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .game-info {
+            flex: 2;
+            min-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .stats-panel, .tasks-panel, .rewards-panel, .level-panel, .payout-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffcc00;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #a0e7ff;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-gap: 6px;
+            margin: 0 auto;
+            width: fit-content;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .game-cell {
+            width: 65px;
+            height: 65px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.3s;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-cell:hover {
+            transform: scale(1.08);
+        }
+        
+        .gem-1 { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+        .gem-2 { background: linear-gradient(135deg, #2193b0, #6dd5ed); }
+        .gem-3 { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .gem-4 { background: linear-gradient(135deg, #ffcc00, #ff9900); }
+        .gem-5 { background: linear-gradient(135deg, #9c27b0, #e040fb); }
+        .gem-6 { background: linear-gradient(135deg, #00c9ff, #92fe9d); }
+        
+        .selected {
+            box-shadow: 0 0 0 4px white, 0 0 20px rgba(255, 255, 255, 0.7);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 4px white, 0 0 20px rgba(255, 255, 255, 0.7); }
+            50% { box-shadow: 0 0 0 6px white, 0 0 30px rgba(255, 255, 255, 0.9); }
+            100% { box-shadow: 0 0 0 4px white, 0 0 20px rgba(255, 255, 255, 0.7); }
+        }
+        
+        .vanishing {
+            animation: vanish 0.5s forwards;
+        }
+        
+        @keyframes vanish {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        
+        .new-gem {
+            animation: dropIn 0.5s;
+        }
+        
+        @keyframes dropIn {
+            0% { transform: translateY(-100px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        .level-progress {
+            margin-top: 15px;
+        }
+        
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .level-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .level-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffcc00, #ff9900);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .payout-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            color: #a0e7ff;
+            font-size: 0.9rem;
+        }
+        
+        input, select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.2);
+        }
+        
+        .payout-info {
+            background: rgba(0, 81, 162, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #003087;
+            margin-top: 10px;
+        }
+        
+        .payout-info h4 {
+            color: #009cde;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .payout-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .payout-stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .payout-stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .payout-stat-label {
+            font-size: 0.8rem;
+            color: #a0e7ff;
+        }
+        
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        /* Scrollbar styling */
+        .tasks-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .tasks-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .tasks-list::-webkit-scrollbar-thumb {
+            background: #ffcc00;
+            border-radius: 3px;
+        }
+        
+        .task-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .task-item.completed {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .task-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .task-reward {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .rewards-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .reward-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .reward-item.claimable {
+            background: rgba(255, 204, 0, 0.2);
+            cursor: pointer;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+        }
+        
+        .reward-item.claimable:hover {
+            background: rgba(255, 204, 0, 0.3);
+            transform: scale(1.08);
+        }
+        
+        .reward-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .reward-value {
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #ffcc00, #ff9900);
+            border: none;
+            border-radius: 50px;
+            color: #1a1a2e;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(255, 153, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 153, 0, 0.5);
+        }
+        
+        button:disabled {
+            background: #666;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-paypal {
+            background: linear-gradient(135deg, #003087, #009cde);
+            box-shadow: 0 4px 10px rgba(0, 156, 222, 0.3);
+        }
+        
+        .btn-paypal:hover {
+            box-shadow: 0 6px 20px rgba(0, 156, 222, 0.5);
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border-left: 5px solid #ffcc00;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(150%);
+            transition: transform 0.5s;
+            z-index: 100;
+            max-width: 350px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            color: #ffcc00;
+            font-size: 1.8rem;
+        }
+        
+        .notification.paypal {
+            border-left-color: #003087;
+        }
+        
+        .notification.paypal .notification-icon {
+            color: #009cde;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            color: #ffcc00;
+            font-size: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .transaction-history {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .transaction-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #009cde;
+        }
+        
+        .transaction-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .status-completed {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .status-failed {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        @media (max-width: 1100px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .game-cell {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8rem;
+            }
+            
+            .rewards-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .game-cell {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+            
+            .rewards-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .payout-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-gem"></i> Match3 Rewards - Earn PayPal Payouts</h1>
+            <p class="subtitle">Match gems to earn points, complete tasks, and cash out to your PayPal account!</p>
+            <div class="paypal-note">
+                <i class="fab fa-paypal"></i> Secure PayPal integration - Earn real money by playing!
+            </div>
+        </header>
+        
+        <div class="game-area">
+            <div class="game-board-container">
+                <h2 class="panel-title"><i class="fas fa-gamepad"></i> Game Board - Level <span id="currentLevel">1</span></h2>
+                <div class="game-board" id="gameBoard">
+                    <!-- Game board will be generated by JavaScript -->
+                </div>
+                
+                <div class="controls">
+                    <button id="hintButton"><i class="fas fa-lightbulb"></i> Get Hint (10 coins)</button>
+                    <button id="shuffleButton"><i class="fas fa-random"></i> Shuffle (5 moves)</button>
+                    <button id="newGameButton"><i class="fas fa-redo"></i> New Game</button>
+                </div>
+            </div>
+            
+            <div class="game-info">
+                <div class="payout-panel">
+                    <h2 class="panel-title"><i class="fab fa-paypal"></i> PayPal Payout</h2>
+                    <div class="payout-form">
+                        <div class="form-group">
+                            <label for="paypalEmail">PayPal Email Address</label>
+                            <input type="email" id="paypalEmail" placeholder="your-email@example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="payoutAmount">Amount to Cash Out (USD)</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="payoutSlider" min="1" max="50" step="0.5" value="5" style="flex: 1;">
+                                <span id="payoutAmountDisplay" style="color: #ffcc00; font-weight: bold; min-width: 60px;">$5.00</span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #a0e7ff; margin-top: 5px;">
+                                <span id="pointsRequired">1000 points required</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="paymentMethod">Payment Method</label>
+                            <select id="paymentMethod">
+                                <option value="paypal_friends">PayPal Friends & Family</option>
+                                <option value="paypal_goods">PayPal Goods & Services</option>
+                            </select>
+                        </div>
+                        
+                        <button id="requestPayoutButton" class="btn-paypal">
+                            <i class="fab fa-paypal"></i> Request Payout
+                        </button>
+                        
+                        <button id="viewTransactionsButton" style="background: rgba(255,255,255,0.1); color: white;">
+                            <i class="fas fa-history"></i> View Transaction History
+                        </button>
+                    </div>
+                    
+                    <div class="payout-info">
+                        <h4><i class="fas fa-info-circle"></i> Payout Information</h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 10px;">
+                            Conversion Rate: <strong>200 points = $1 USD</strong><br>
+                            Minimum Payout: <strong>$1.00</strong> (200 points)<br>
+                            Processing Time: 24-48 hours
+                        </p>
+                        <div class="payout-stats">
+                            <div class="payout-stat">
+                                <div class="payout-stat-value" id="availablePoints">0</div>
+                                <div class="payout-stat-label">Available Points</div>
+                            </div>
+                            <div class="payout-stat">
+                                <div class="payout-stat-value" id="availableBalance">$0.00</div>
+                                <div class="payout-stat-label">Available Balance</div>
+                            </div>
+                            <div class="payout-stat">
+                                <div class="payout-stat-value" id="totalPayouts">$0.00</div>
+                                <div class="payout-stat-label">Total Paid Out</div>
+                            </div>
+                            <div class="payout-stat">
+                                <div class="payout-stat-value" id="pendingPayouts">$0.00</div>
+                                <div class="payout-stat-label">Pending Payouts</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-panel">
+                    <h2 class="panel-title"><i class="fas fa-chart-line"></i> Game Stats</h2>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="score">0</div>
+                            <div class="stat-label">Score</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="moves">0</div>
+                            <div class="stat-label">Moves</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="coins">200</div>
+                            <div class="stat-label">Coins</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="earnedPoints">0</div>
+                            <div class="stat-label">Earned Points</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tasks-panel">
+                    <h2 class="panel-title"><i class="fas fa-tasks"></i> Daily Tasks</h2>
+                    <div class="tasks-list" id="tasksList">
+                        <!-- Tasks will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="notification" id="notification">
+            <div class="notification-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            <div>
+                <div class="notification-title">Reward Claimed!</div>
+                <div class="notification-message">You earned 50 coins!</div>
+            </div>
+        </div>
+        
+        <!-- Transaction History Modal -->
+        <div class="modal" id="transactionModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title"><i class="fas fa-history"></i> Transaction History</h3>
+                    <button class="close-modal" id="closeTransactionModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="transaction-history" id="transactionHistory">
+                        <!-- Transactions will be loaded here -->
+                    </div>
+                    <button id="refreshTransactions" style="margin-top: 15px;">
+                        <i class="fas fa-sync-alt"></i> Refresh Transactions
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PayPal Business Client ID (Sandbox for testing - replace with live in production)
+        const PAYPAL_CLIENT_ID = 'AYryR3jenZT-osPXEEf-p4UbK6te7an6Hhr4rOM8rsyBF9uxgwAj9S7Id91MHLn2Sjcdlap6LxTg_4Wl';
+        
+        // Points to USD conversion rate
+        const POINTS_TO_USD_RATE = 0.005; // 200 points = $1 USD
+        const MINIMUM_PAYOUT = 1.00; // $1 minimum
+        const MINIMUM_POINTS = 200; // Minimum points for payout
+        
+        // API endpoints (simulated for this demo)
+        const API_BASE_URL = 'https://api.match3rewards.com'; // Replace with your actual API URL
+        
+        // Game state
+        const gameState = {
+            score: 0,
+            moves: 0,
+            coins: 200,
+            earnedPoints: 0,
+            board: [],
+            selectedGem: null,
+            currentLevel: 1,
+            levelScore: 0,
+            levelTarget: 1000,
+            maxLevel: 100,
+            tasks: [
+                { id: 1, name: "Make 10 matches", type: "matches", target: 10, progress: 0, completed: false, reward: { coins: 50, points: 10 } },
+                { id: 2, name: "Make 3 matches of 4+ gems", type: "match4", target: 3, progress: 0, completed: false, reward: { coins: 75, points: 15 } },
+                { id: 3, name: "Score 1000 points", type: "score", target: 1000, progress: 0, completed: false, reward: { coins: 100, points: 20 } },
+                { id: 4, name: "Complete level 1", type: "completeLevel", target: 1, progress: 0, completed: false, reward: { coins: 200, points: 50 } }
+            ],
+            // Payout state
+            paypalEmail: '',
+            payoutHistory: [],
+            availablePoints: 0,
+            totalPayouts: 0,
+            pendingPayouts: 0
+        };
+
+        // Game constants
+        const BOARD_SIZE = 8;
+        const GEM_TYPES = 6;
+        const BASE_SCORE_MULTIPLIER = 10;
+        
+        // Level scaling
+        const LEVEL_SCORE_MULTIPLIER = 1.05;
+        const LEVEL_REWARD_BASE = 50;
+        const LEVEL_TARGET_MULTIPLIER = 1.2;
+
+        // DOM elements
+        const gameBoard = document.getElementById('gameBoard');
+        const scoreElement = document.getElementById('score');
+        const movesElement = document.getElementById('moves');
+        const coinsElement = document.getElementById('coins');
+        const earnedPointsElement = document.getElementById('earnedPoints');
+        const tasksList = document.getElementById('tasksList');
+        const notification = document.getElementById('notification');
+        const hintButton = document.getElementById('hintButton');
+        const shuffleButton = document.getElementById('shuffleButton');
+        const newGameButton = document.getElementById('newGameButton');
+        const currentLevelElement = document.getElementById('currentLevel');
+        
+        // Payout elements
+        const paypalEmailInput = document.getElementById('paypalEmail');
+        const payoutSlider = document.getElementById('payoutSlider');
+        const payoutAmountDisplay = document.getElementById('payoutAmountDisplay');
+        const pointsRequiredElement = document.getElementById('pointsRequired');
+        const paymentMethodSelect = document.getElementById('paymentMethod');
+        const requestPayoutButton = document.getElementById('requestPayoutButton');
+        const viewTransactionsButton = document.getElementById('viewTransactionsButton');
+        const availablePointsElement = document.getElementById('availablePoints');
+        const availableBalanceElement = document.getElementById('availableBalance');
+        const totalPayoutsElement = document.getElementById('totalPayouts');
+        const pendingPayoutsElement = document.getElementById('pendingPayouts');
+        
+        // Modal elements
+        const transactionModal = document.getElementById('transactionModal');
+        const transactionHistoryElement = document.getElementById('transactionHistory');
+        const closeTransactionModal = document.getElementById('closeTransactionModal');
+        const refreshTransactionsButton = document.getElementById('refreshTransactions');
+
+        // Initialize the game
+        function initGame() {
+            createBoard();
+            renderBoard();
+            updateStats();
+            renderTasks();
+            setupEventListeners();
+            loadPayoutData();
+            
+            // Load saved PayPal email if exists
+            const savedEmail = localStorage.getItem('match3_paypal_email');
+            if (savedEmail) {
+                paypalEmailInput.value = savedEmail;
+                gameState.paypalEmail = savedEmail;
+            }
+            
+            // Initialize payout slider
+            updatePayoutSlider();
+        }
+
+        // Create the game board
+        function createBoard() {
+            gameState.board = [];
+            
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                gameState.board[row] = [];
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    let gemType;
+                    do {
+                        gemType = Math.floor(Math.random() * GEM_TYPES) + 1;
+                    } while (
+                        (row >= 2 && 
+                         gameState.board[row-1][col] === gemType && 
+                         gameState.board[row-2][col] === gemType) ||
+                        (col >= 2 && 
+                         gameState.board[row][col-1] === gemType && 
+                         gameState.board[row][col-2] === gemType)
+                    );
+                    
+                    gameState.board[row][col] = gemType;
+                }
+            }
+        }
+
+        // Render the game board
+        function renderBoard() {
+            gameBoard.innerHTML = '';
+            
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    const gem = gameState.board[row][col];
+                    const cell = document.createElement('div');
+                    cell.className = `game-cell gem-${gem}`;
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.innerHTML = '<i class="fas fa-gem"></i>';
+                    
+                    cell.addEventListener('click', () => selectGem(row, col));
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
+
+        // Select a gem
+        function selectGem(row, col) {
+            if (!gameState.selectedGem) {
+                gameState.selectedGem = { row, col };
+                document.querySelector(`[data-row="${row}"][data-col="${col}"]`).classList.add('selected');
+                return;
+            }
+            
+            const selected = gameState.selectedGem;
+            
+            if (selected.row === row && selected.col === col) {
+                document.querySelector(`[data-row="${row}"][data-col="${col}"]`).classList.remove('selected');
+                gameState.selectedGem = null;
+                return;
+            }
+            
+            const isAdjacent = 
+                (Math.abs(selected.row - row) === 1 && selected.col === col) ||
+                (Math.abs(selected.col - col) === 1 && selected.row === row);
+            
+            if (!isAdjacent) {
+                document.querySelector(`[data-row="${selected.row}"][data-col="${selected.col}"]`).classList.remove('selected');
+                gameState.selectedGem = { row, col };
+                document.querySelector(`[data-row="${row}"][data-col="${col}"]`).classList.add('selected');
+                return;
+            }
+            
+            swapGems(selected.row, selected.col, row, col);
+        }
+
+        // Swap two gems
+        function swapGems(row1, col1, row2, col2) {
+            const temp = gameState.board[row1][col1];
+            gameState.board[row1][col1] = gameState.board[row2][col2];
+            gameState.board[row2][col2] = temp;
+            
+            const matches = findMatches();
+            
+            if (matches.length > 0) {
+                gameState.moves++;
+                updateStats();
+                
+                if (gameState.selectedGem) {
+                    document.querySelector(`[data-row="${gameState.selectedGem.row}"][data-col="${gameState.selectedGem.col}"]`).classList.remove('selected');
+                    gameState.selectedGem = null;
+                }
+                
+                processMatches(matches);
+            } else {
+                gameState.board[row2][col2] = gameState.board[row1][col1];
+                gameState.board[row1][col1] = temp;
+                
+                showNotification("No match found! Try another swap.", "error");
+            }
+        }
+
+        // Find all matches on the board
+        function findMatches() {
+            const matches = [];
+            
+            // Check horizontal matches
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE - 2; col++) {
+                    const gem = gameState.board[row][col];
+                    if (gem && 
+                        gem === gameState.board[row][col+1] && 
+                        gem === gameState.board[row][col+2]) {
+                        
+                        let matchLength = 3;
+                        while (col + matchLength < BOARD_SIZE && gameState.board[row][col+matchLength] === gem) {
+                            matchLength++;
+                        }
+                        
+                        matches.push({
+                            row,
+                            col,
+                            length: matchLength,
+                            direction: 'horizontal',
+                            gemType: gem
+                        });
+                        
+                        col += matchLength - 1;
+                    }
+                }
+            }
+            
+            // Check vertical matches
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                for (let row = 0; row < BOARD_SIZE - 2; row++) {
+                    const gem = gameState.board[row][col];
+                    if (gem && 
+                        gem === gameState.board[row+1][col] && 
+                        gem === gameState.board[row+2][col]) {
+                        
+                        let matchLength = 3;
+                        while (row + matchLength < BOARD_SIZE && gameState.board[row+matchLength][col] === gem) {
+                            matchLength++;
+                        }
+                        
+                        matches.push({
+                            row,
+                            col,
+                            length: matchLength,
+                            direction: 'vertical',
+                            gemType: gem
+                        });
+                        
+                        row += matchLength - 1;
+                    }
+                }
+            }
+            
+            return matches;
+        }
+
+        // Process matches and update score
+        function processMatches(matches) {
+            if (matches.length === 0) return;
+            
+            let totalScore = 0;
+            let match4Count = 0;
+            let specialMatchCount = 0;
+            
+            const levelMultiplier = Math.pow(LEVEL_SCORE_MULTIPLIER, gameState.currentLevel - 1);
+            const scoreMultiplier = BASE_SCORE_MULTIPLIER * levelMultiplier;
+            
+            const cellsToVanish = new Set();
+            
+            matches.forEach(match => {
+                const { row, col, length, direction } = match;
+                
+                if (direction === 'horizontal') {
+                    for (let i = 0; i < length; i++) {
+                        cellsToVanish.add(`${row},${col + i}`);
+                    }
+                } else {
+                    for (let i = 0; i < length; i++) {
+                        cellsToVanish.add(`${row + i},${col}`);
+                    }
+                }
+                
+                const matchScore = length * scoreMultiplier * (length - 2);
+                totalScore += matchScore;
+                
+                if (length >= 4) {
+                    match4Count++;
+                    if (length >= 5) {
+                        specialMatchCount++;
+                    }
+                }
+            });
+            
+            // Animate vanishing cells
+            cellsToVanish.forEach(cellKey => {
+                const [row, col] = cellKey.split(',').map(Number);
+                const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                if (cell) {
+                    cell.classList.add('vanishing');
+                }
+            });
+            
+            setTimeout(() => {
+                // Remove vanished gems from board
+                cellsToVanish.forEach(cellKey => {
+                    const [row, col] = cellKey.split(',').map(Number);
+                    gameState.board[row][col] = 0;
+                });
+                
+                // Update game state
+                gameState.score += totalScore;
+                gameState.levelScore += totalScore;
+                
+                // Earn points (1 point per 100 score)
+                const earnedPoints = Math.floor(totalScore / 100);
+                gameState.earnedPoints += earnedPoints;
+                gameState.availablePoints += earnedPoints;
+                
+                // Check for level completion
+                if (gameState.levelScore >= gameState.levelTarget) {
+                    completeLevel();
+                }
+                
+                // Update tasks
+                updateTasks(matches, totalScore);
+                
+                // Update UI
+                updateStats();
+                updatePayoutStats();
+                
+                // Fill the board with new gems
+                fillBoard();
+                
+                // Show match notification
+                if (matches.length > 0) {
+                    let message = `Match! +${totalScore} points (+${earnedPoints} payout points)`;
+                    if (match4Count > 0) {
+                        message += ` (${match4Count} special match${match4Count > 1 ? 'es' : ''})`;
+                    }
+                    showNotification(message, "success");
+                }
+            }, 500);
+        }
+
+        // Fill the board after matches
+        function fillBoard() {
+            // Move gems down
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                let emptySpaces = 0;
+                
+                for (let row = BOARD_SIZE - 1; row >= 0; row--) {
+                    if (gameState.board[row][col] === 0) {
+                        emptySpaces++;
+                    } else if (emptySpaces > 0) {
+                        gameState.board[row + emptySpaces][col] = gameState.board[row][col];
+                        gameState.board[row][col] = 0;
+                    }
+                }
+                
+                for (let row = 0; row < emptySpaces; row++) {
+                    gameState.board[row][col] = Math.floor(Math.random() * GEM_TYPES) + 1;
+                }
+            }
+            
+            renderBoard();
+            
+            setTimeout(() => {
+                for (let row = 0; row < BOARD_SIZE; row++) {
+                    for (let col = 0; col < BOARD_SIZE; col++) {
+                        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                        if (row < 3 && gameState.board[row][col] !== 0) {
+                            cell.classList.add('new-gem');
+                        }
+                    }
+                }
+            }, 50);
+            
+            setTimeout(() => {
+                const newMatches = findMatches();
+                if (newMatches.length > 0) {
+                    processMatches(newMatches);
+                }
+            }, 800);
+        }
+
+        // Complete the current level
+        function completeLevel() {
+            const levelReward = Math.floor(LEVEL_REWARD_BASE * Math.pow(1.1, gameState.currentLevel - 1));
+            const levelPoints = Math.floor(levelReward / 2);
+            
+            // Award coins and points
+            gameState.coins += levelReward;
+            gameState.earnedPoints += levelPoints;
+            gameState.availablePoints += levelPoints;
+            
+            // Update tasks
+            gameState.tasks.forEach(task => {
+                if (task.type === 'completeLevel' && task.target === gameState.currentLevel) {
+                    task.progress = 1;
+                    task.completed = true;
+                }
+            });
+            
+            showNotification(`Level ${gameState.currentLevel} completed! +${levelReward} coins, +${levelPoints} points`, "reward");
+            
+            // Move to next level if not at max
+            if (gameState.currentLevel < gameState.maxLevel) {
+                setTimeout(() => {
+                    gameState.currentLevel++;
+                    gameState.levelTarget = Math.floor(gameState.levelTarget * LEVEL_TARGET_MULTIPLIER);
+                    gameState.levelScore = 0;
+                    
+                    updateTasksForNewLevel();
+                    updateStats();
+                    renderTasks();
+                    
+                    createBoard();
+                    renderBoard();
+                    
+                    showNotification(`Level ${gameState.currentLevel} started! Target: ${gameState.levelTarget} points`, "info");
+                }, 2000);
+            }
+        }
+
+        // Update tasks based on matches
+        function updateTasks(matches, matchScore) {
+            let updated = false;
+            
+            gameState.tasks.forEach(task => {
+                if (task.completed) return;
+                
+                switch(task.type) {
+                    case 'matches':
+                        task.progress += matches.length;
+                        break;
+                    case 'match4':
+                        const match4Count = matches.filter(m => m.length >= 4).length;
+                        task.progress += match4Count;
+                        break;
+                    case 'score':
+                        task.progress += matchScore;
+                        break;
+                    case 'completeLevel':
+                        break;
+                }
+                
+                if (task.progress >= task.target) {
+                    task.completed = true;
+                    updated = true;
+                    
+                    // Award rewards
+                    gameState.coins += task.reward.coins;
+                    gameState.earnedPoints += task.reward.points;
+                    gameState.availablePoints += task.reward.points;
+                    
+                    showNotification(`Task "${task.name}" completed! +${task.reward.coins} coins, +${task.reward.points} points`, "reward");
+                }
+            });
+            
+            if (updated) {
+                renderTasks();
+                updateStats();
+                updatePayoutStats();
+            }
+        }
+
+        // Update tasks for new level
+        function updateTasksForNewLevel() {
+            gameState.tasks.forEach(task => {
+                if (task.type === 'completeLevel') {
+                    task.target = gameState.currentLevel;
+                    task.progress = 0;
+                    task.completed = false;
+                    task.reward.coins = Math.floor(50 + gameState.currentLevel * 10);
+                    task.reward.points = Math.floor(task.reward.coins / 2);
+                }
+            });
+        }
+
+        // Update game stats display
+        function updateStats() {
+            scoreElement.textContent = gameState.score;
+            movesElement.textContent = gameState.moves;
+            coinsElement.textContent = gameState.coins;
+            earnedPointsElement.textContent = gameState.earnedPoints;
+            currentLevelElement.textContent = gameState.currentLevel;
+        }
+
+        // Update payout statistics display
+        function updatePayoutStats() {
+            availablePointsElement.textContent = gameState.availablePoints;
+            availableBalanceElement.textContent = `$${(gameState.availablePoints * POINTS_TO_USD_RATE).toFixed(2)}`;
+            totalPayoutsElement.textContent = `$${gameState.totalPayouts.toFixed(2)}`;
+            pendingPayoutsElement.textContent = `$${gameState.pendingPayouts.toFixed(2)}`;
+            
+            // Update payout slider max based on available points
+            const maxPayout = Math.min(50, gameState.availablePoints * POINTS_TO_USD_RATE);
+            payoutSlider.max = maxPayout.toFixed(2);
+            updatePayoutSlider();
+        }
+
+        // Update payout slider display
+        function updatePayoutSlider() {
+            const payoutAmount = parseFloat(payoutSlider.value);
+            const pointsRequired = Math.ceil(payoutAmount / POINTS_TO_USD_RATE);
+            
+            payoutAmountDisplay.textContent = `$${payoutAmount.toFixed(2)}`;
+            pointsRequiredElement.textContent = `${pointsRequired} points required`;
+            
+            // Disable payout button if not enough points or no email
+            const hasEnoughPoints = gameState.availablePoints >= pointsRequired;
+            const hasValidEmail = paypalEmailInput.value.includes('@') && paypalEmailInput.value.includes('.');
+            
+            requestPayoutButton.disabled = !hasEnoughPoints || !hasValidEmail || payoutAmount < MINIMUM_PAYOUT;
+            
+            if (payoutAmount < MINIMUM_PAYOUT) {
+                pointsRequiredElement.innerHTML += ` <span style="color: #ff6b6b;">(Minimum: $${MINIMUM_PAYOUT})</span>`;
+            }
+        }
+
+        // Load payout data from localStorage
+        function loadPayoutData() {
+            const savedData = localStorage.getItem('match3_payout_data');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                gameState.payoutHistory = data.payoutHistory || [];
+                gameState.totalPayouts = data.totalPayouts || 0;
+                gameState.pendingPayouts = data.pendingPayouts || 0;
+                gameState.availablePoints = data.availablePoints || 0;
+                gameState.earnedPoints = data.earnedPoints || 0;
+            }
+            updatePayoutStats();
+        }
+
+        // Save payout data to localStorage
+        function savePayoutData() {
+            const data = {
+                payoutHistory: gameState.payoutHistory,
+                totalPayouts: gameState.totalPayouts,
+                pendingPayouts: gameState.pendingPayouts,
+                availablePoints: gameState.availablePoints,
+                earnedPoints: gameState.earnedPoints
+            };
+            localStorage.setItem('match3_payout_data', JSON.stringify(data));
+        }
+
+        // Request PayPal payout
+        async function requestPayout() {
+            const payoutAmount = parseFloat(payoutSlider.value);
+            const pointsRequired = Math.ceil(payoutAmount / POINTS_TO_USD_RATE);
+            const paypalEmail = paypalEmailInput.value;
+            const paymentMethod = paymentMethodSelect.value;
+            
+            // Validate inputs
+            if (payoutAmount < MINIMUM_PAYOUT) {
+                showNotification(`Minimum payout is $${MINIMUM_PAYOUT}`, "error");
+                return;
+            }
+            
+            if (gameState.availablePoints < pointsRequired) {
+                showNotification(`Not enough points. You need ${pointsRequired} points for this payout.`, "error");
+                return;
+            }
+            
+            if (!paypalEmail || !paypalEmail.includes('@') || !paypalEmail.includes('.')) {
+                showNotification("Please enter a valid PayPal email address", "error");
+                return;
+            }
+            
+            // Save PayPal email
+            localStorage.setItem('match3_paypal_email', paypalEmail);
+            gameState.paypalEmail = paypalEmail;
+            
+            // Create payout request
+            const payoutRequest = {
+                id: 'PAYOUT-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                amount: payoutAmount,
+                pointsUsed: pointsRequired,
+                paypalEmail: paypalEmail,
+                paymentMethod: paymentMethod,
+                status: 'pending',
+                timestamp: new Date().toISOString(),
+                estimatedCompletion: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
+            };
+            
+            // In a real implementation, you would send this to your backend API
+            // For this demo, we'll simulate the API call
+            
+            showNotification("Processing payout request...", "info");
+            
+            // Simulate API call delay
+            setTimeout(async () => {
+                try {
+                    // Simulate API response
+                    const response = await simulatePayPalPayoutAPI(payoutRequest);
+                    
+                    if (response.success) {
+                        // Update game state
+                        gameState.availablePoints -= pointsRequired;
+                        gameState.pendingPayouts += payoutAmount;
+                        gameState.payoutHistory.unshift(payoutRequest);
+                        
+                        // Save data
+                        savePayoutData();
+                        
+                        // Update UI
+                        updatePayoutStats();
+                        updatePayoutSlider();
+                        
+                        showNotification(`Payout request submitted! $${payoutAmount} will be sent to ${paypalEmail} within 24-48 hours.`, "paypal");
+                        
+                        console.log('PayPal Payout Request Details:', {
+                            clientId: PAYPAL_CLIENT_ID,
+                            payoutId: payoutRequest.id,
+                            amount: payoutAmount,
+                            recipient: paypalEmail,
+                            method: paymentMethod
+                        });
+                    } else {
+                        showNotification(`Payout failed: ${response.message}`, "error");
+                    }
+                } catch (error) {
+                    console.error('Payout error:', error);
+                    showNotification("Payout request failed. Please try again later.", "error");
+                }
+            }, 1500);
+        }
+
+        // Simulate PayPal Payout API call
+        async function simulatePayPalPayoutAPI(payoutRequest) {
+            // This is a simulation - in a real implementation, you would:
+            // 1. Send request to your backend server
+            // 2. Backend would use PayPal Payouts API with your client credentials
+            // 3. Process the actual payment
+            
+            console.log('Simulating PayPal Payout API call with:', {
+                clientId: PAYPAL_CLIENT_ID,
+                payout: payoutRequest
+            });
+            
+            // Simulate success 90% of the time
+            const success = Math.random() > 0.1;
+            
+            if (success) {
+                return {
+                    success: true,
+                    payoutId: payoutRequest.id,
+                    message: "Payout request accepted and queued for processing"
+                };
+            } else {
+                return {
+                    success: false,
+                    message: "Temporary PayPal API issue. Please try again in a few minutes."
+                };
+            }
+        }
+
+        // Load and display transaction history
+        function loadTransactionHistory() {
+            transactionHistoryElement.innerHTML = '';
+            
+            if (gameState.payoutHistory.length === 0) {
+                transactionHistoryElement.innerHTML = '<p style="text-align: center; color: #a0e7ff; padding: 20px;">No payout history yet.</p>';
+                return;
+            }
+            
+            gameState.payoutHistory.forEach(transaction => {
+                const transactionElement = document.createElement('div');
+                transactionElement.className = 'transaction-item';
+                
+                const date = new Date(transaction.timestamp);
+                const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                
+                let statusClass = 'status-pending';
+                let statusText = 'Pending';
+                
+                // Simulate some completed transactions
+                if (Math.random() > 0.7 && transaction.timestamp < new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()) {
+                    statusClass = 'status-completed';
+                    statusText = 'Completed';
+                    
+                    // Update pending/completed amounts
+                    if (transaction.status === 'pending') {
+                        gameState.pendingPayouts -= transaction.amount;
+                        gameState.totalPayouts += transaction.amount;
+                        transaction.status = 'completed';
+                    }
+                }
+                
+                transactionElement.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>$${transaction.amount.toFixed(2)}</strong>
+                            <span class="transaction-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: #a0e7ff;">${formattedDate}</div>
+                    </div>
+                    <div style="font-size: 0.9rem; margin-top: 5px;">
+                        To: ${transaction.paypalEmail}<br>
+                        ID: ${transaction.id}
+                    </div>
+                `;
+                
+                transactionHistoryElement.appendChild(transactionElement);
+            });
+            
+            // Save updated data
+            savePayoutData();
+            updatePayoutStats();
+        }
+
+        // Show notification
+        function showNotification(message, type = "info") {
+            const title = type === "reward" ? "Reward!" : 
+                         type === "error" ? "Oops!" : 
+                         type === "success" ? "Success!" : 
+                         type === "paypal" ? "PayPal Payout" : "Info";
+            
+            const icon = type === "reward" ? "fas fa-gift" : 
+                        type === "error" ? "fas fa-exclamation-circle" : 
+                        type === "success" ? "fas fa-check-circle" : 
+                        type === "paypal" ? "fab fa-paypal" : "fas fa-info-circle";
+            
+            notification.className = `notification ${type === 'paypal' ? 'paypal' : ''}`;
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="${icon}"></i>
+                </div>
+                <div>
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+            `;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Get a hint
+        function showHint() {
+            if (gameState.coins < 10) {
+                showNotification("You need 10 coins to get a hint!", "error");
+                return;
+            }
+            
+            gameState.coins -= 10;
+            updateStats();
+            
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    if (col < BOARD_SIZE - 1) {
+                        const temp = gameState.board[row][col];
+                        gameState.board[row][col] = gameState.board[row][col+1];
+                        gameState.board[row][col+1] = temp;
+                        
+                        const matches = findMatches();
+                        
+                        gameState.board[row][col+1] = gameState.board[row][col];
+                        gameState.board[row][col] = temp;
+                        
+                        if (matches.length > 0) {
+                            const cell1 = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                            const cell2 = document.querySelector(`[data-row="${row}"][data-col="${col+1}"]`);
+                            
+                            cell1.style.boxShadow = "0 0 20px #ffcc00, inset 0 0 20px #ffcc00";
+                            cell2.style.boxShadow = "0 0 20px #ffcc00, inset 0 0 20px #ffcc00";
+                            
+                            setTimeout(() => {
+                                cell1.style.boxShadow = "";
+                                cell2.style.boxShadow = "";
+                            }, 2000);
+                            
+                            showNotification("Try swapping the highlighted gems!", "info");
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            showNotification("No hints available. Try shuffling the board.", "info");
+        }
+
+        // Shuffle the board
+        function shuffleBoard() {
+            if (gameState.moves < 5) {
+                showNotification("You need at least 5 moves to shuffle the board", "error");
+                return;
+            }
+            
+            gameState.moves += 5;
+            
+            let gems = [];
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    gems.push(gameState.board[row][col]);
+                }
+            }
+            
+            for (let i = gems.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [gems[i], gems[j]] = [gems[j], gems[i]];
+            }
+            
+            let index = 0;
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    gameState.board[row][col] = gems[index++];
+                }
+            }
+            
+            renderBoard();
+            updateStats();
+            showNotification("Board shuffled! 5 moves added to your count.", "info");
+        }
+
+        // Start a new game
+        function newGame() {
+            if (!confirm("Are you sure you want to start a new game? Your progress will be lost.")) {
+                return;
+            }
+            
+            gameState.score = 0;
+            gameState.moves = 0;
+            gameState.coins = 200;
+            gameState.currentLevel = 1;
+            gameState.levelScore = 0;
+            gameState.levelTarget = 1000;
+            
+            gameState.tasks.forEach(task => {
+                task.progress = 0;
+                task.completed = false;
+                if (task.type === 'completeLevel') {
+                    task.target = 1;
+                    task.reward.coins = 200;
+                    task.reward.points = 100;
+                }
+            });
+            
+            createBoard();
+            renderBoard();
+            updateStats();
+            renderTasks();
+            
+            showNotification("New game started! Good luck!", "success");
+        }
+
+        // Render tasks list
+        function renderTasks() {
+            tasksList.innerHTML = '';
+            
+            gameState.tasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
+                
+                const progressPercent = Math.min(100, (task.progress / task.target) * 100);
+                
+                taskElement.innerHTML = `
+                    <div>
+                        <div class="task-name">${task.name}</div>
+                        <div class="task-progress">
+                            <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px;">
+                                <div style="width: ${progressPercent}%; height: 100%; background: #4CAF50; border-radius: 3px;"></div>
+                            </div>
+                            <span>${task.progress}/${task.target}</span>
+                        </div>
+                    </div>
+                    <div class="task-reward">+${task.reward.coins} <i class="fas fa-coins"></i><br>+${task.reward.points} <i class="fas fa-star"></i></div>
+                `;
+                
+                tasksList.appendChild(taskElement);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            hintButton.addEventListener('click', showHint);
+            shuffleButton.addEventListener('click', shuffleBoard);
+            newGameButton.addEventListener('click', newGame);
+            
+            // Payout event listeners
+            payoutSlider.addEventListener('input', updatePayoutSlider);
+            paypalEmailInput.addEventListener('input', updatePayoutSlider);
+            requestPayoutButton.addEventListener('click', requestPayout);
+            
+            // Transaction history modal
+            viewTransactionsButton.addEventListener('click', () => {
+                loadTransactionHistory();
+                transactionModal.style.display = 'flex';
+            });
+            
+            closeTransactionModal.addEventListener('click', () => {
+                transactionModal.style.display = 'none';
+            });
+            
+            refreshTransactionsButton.addEventListener('click', loadTransactionHistory);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (event) => {
+                if (event.target === transactionModal) {
+                    transactionModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize the game when page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
