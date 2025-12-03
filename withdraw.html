@@ -36,7 +36,7 @@
       return;
     }
     try {
-      const res = await fetch('https://api.match3onlinerewareds.gamer.gd/api/withdraw', {
+      const res = await fetch('https://YOUR_BACKEND_ORIGIN/api/withdraw', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,5 +52,3 @@
     }
   });
 </script>
-
-<!-- CORS note: Ensure the backend at https://api.match3onlinerewareds.gamer.gd allows CORS from your site origin -->
